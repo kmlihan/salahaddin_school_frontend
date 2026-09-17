@@ -1,0 +1,449 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  CSS variables drive the accent colour. The default is the school blue.
+  When a *student* logs in, the AuthContext sets these to either blue (male)
+  or pink (female) based on the student's `gender` field — fulfilling the
+  gender-themed UI requirement.
+*/
+:root {
+  --accent: 30 64 175;          /* blue-800 */
+  --accent-soft: 219 234 254;   /* blue-100 */
+  --accent-fg: 255 255 255;
+}
+.dark {
+  /* In dark mode we want the active-link "pill" (background --accent-soft,
+     text --accent) to read as bright text on a dim background. So dark mode
+     gets a brighter accent foreground (sky-400) and keeps the dim soft
+     background colour (indigo-950 / slate-800). */
+  --accent: 125 211 252;        /* sky-300 — bright on dark */
+  --accent-soft: 30 41 59;      /* slate-800 — subtle pill background */
+}
+
+/* Female accent (pink) */
+.theme-female {
+  --accent: 190 24 93;          /* pink-700 */
+  --accent-soft: 252 231 243;   /* pink-100 */
+}
+.dark.theme-female {
+  --accent: 244 114 182;        /* pink-400 */
+  --accent-soft: 60 22 44;      /* dark pink */
+}
+
+/* RTL toggle (Arabic) */
+html[dir="rtl"] body {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Utility shortcuts */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition;
+}
+.btn-primary {
+  background-color: rgb(var(--accent));
+  color: rgb(var(--accent-fg));
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-soft {
+  background-color: rgb(var(--accent-soft));
+  color: rgb(var(--accent));
+}
+.btn-ghost {
+  @apply text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800;
+}
+.input {
+  @apply w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2;
+}
+.input:focus { box-shadow: 0 0 0 2px rgb(var(--accent) / 0.4); }
+.card {
+  @apply bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 p-4;
+}
+
+body {
+  @apply bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen;
+}
+
+/*
+  Kid-friendly landing page animations and helpers.
+  All scoped under `.kid-` so nothing else in the app picks them up by accident.
+
+  We respect prefers-reduced-motion: any animation/transform here is gated by
+  the media query so people who've asked for less motion get a still page.
+*/
+@keyframes kid-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+@keyframes kid-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-6px) rotate(2deg); }
+}
+@keyframes kid-pop {
+  0%   { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+@keyframes kid-wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+@keyframes kid-spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes kid-blob {
+  0%, 100% { border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%; }
+  50%      { border-radius: 40% 60% 60% 40% / 60% 40% 60% 40%; }
+}
+@keyframes kid-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kid-float       { animation: kid-float 4s ease-in-out infinite; }
+  .kid-bob         { animation: kid-bob 3s ease-in-out infinite; }
+  .kid-wiggle      { animation: kid-wiggle 2.5s ease-in-out infinite; }
+  .kid-spin-slow   { animation: kid-spin-slow 24s linear infinite; }
+  .kid-blob        { animation: kid-blob 12s ease-in-out infinite; }
+  .kid-pop         { animation: kid-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .kid-fade-up     { animation: kid-fade-up 0.7s ease-out both; }
+  /* delay variants so cards stagger in */
+  .kid-d1 { animation-delay: 0.10s; }
+  .kid-d2 { animation-delay: 0.25s; }
+  .kid-d3 { animation-delay: 0.40s; }
+  .kid-d4 { animation-delay: 0.55s; }
+
+  .kid-tile {
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
+  }
+  .kid-tile:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 18px 40px -10px rgba(99, 102, 241, 0.35);
+  }
+
+  .kid-cta {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  .kid-cta:hover {
+    transform: translateY(-3px) scale(1.04);
+  }
+  .kid-cta:active { transform: translateY(0) scale(0.98); }
+}
+
+/*
+  Kid-friendly surfaces with light/dark variants.
+
+  Light mode keeps the bright pastel palette (yellow → sky → lavender → pink).
+  Dark mode swaps to a deeper, richer take on the same hues — saturated indigo,
+  violet and teal so the page still feels playful but reads comfortably with
+  light text. Each `.kid-bg-*` class applies a gradient; matching `.kid-text-*`
+  utilities keep contrast acceptable in both modes.
+*/
+
+/* Hero background */
+.kid-bg-hero {
+  background: linear-gradient(135deg, #FEF3C7 0%, #BAE6FD 35%, #C4B5FD 70%, #FBCFE8 100%);
+}
+.dark .kid-bg-hero {
+  background: linear-gradient(135deg, #1E1B4B 0%, #1E3A8A 35%, #4C1D95 70%, #831843 100%);
+}
+
+/* Footer background */
+.kid-bg-footer {
+  background: linear-gradient(135deg, #312E81 0%, #1E40AF 50%, #0E7490 100%);
+}
+.dark .kid-bg-footer {
+  background: linear-gradient(135deg, #1E1B4B 0%, #0C1A4A 50%, #083344 100%);
+}
+
+/* About card */
+.kid-bg-about {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FEF9C3 100%);
+  border: 3px solid #FDE68A;
+}
+.dark .kid-bg-about {
+  background: linear-gradient(135deg, #1F1B30 0%, #3F2D0E 100%);
+  border-color: #92400E;
+}
+
+/* News aside card */
+.kid-bg-news {
+  background: linear-gradient(135deg, #FFFFFF 0%, #DBEAFE 100%);
+  border: 3px solid #BFDBFE;
+}
+.dark .kid-bg-news {
+  background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+  border-color: #2563EB;
+}
+
+/* Inner mini-cards inside the news aside */
+.kid-news-item {
+  background: white;
+  border: 2px solid #DBEAFE;
+}
+.dark .kid-news-item {
+  background: #1E293B;          /* slate-800 */
+  border-color: #1E3A8A;        /* indigo-900 */
+}
+
+/* Body copy and headline colours that need to flip in dark mode. We can't
+   put dark: on inline `style` so these classes do it. */
+.kid-text-strong { color: #0F172A; }            /* slate-900 */
+.dark .kid-text-strong { color: #F1F5F9; }      /* slate-100 */
+.kid-text-body   { color: #334155; }            /* slate-700 */
+.dark .kid-text-body   { color: #CBD5E1; }      /* slate-300 */
+.kid-text-muted  { color: #64748B; }            /* slate-500 */
+.dark .kid-text-muted  { color: #94A3B8; }      /* slate-400 */
+
+/* Wave at the bottom of the hero — fills with the page background colour */
+.kid-wave-fill { fill: #F8FAFC; }                /* slate-50 (page bg) */
+.dark .kid-wave-fill { fill: #020617; }          /* slate-950 */
+
+/*
+  Hero headline. In light mode it gets a vivid pink → purple → blue gradient
+  (great contrast against the pastel hero). In dark mode the same gradient
+  vanishes against the deep indigo background, so we drop the gradient and
+  use a bright cream-yellow that pops against the dark hero — same energy,
+  readable contrast.
+*/
+.kid-hero-title {
+  background: linear-gradient(90deg, #DB2777, #7C3AED, #2563EB);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.dark .kid-hero-title {
+  /* Reset the gradient text and use a solid colour. */
+  background: none;
+  -webkit-text-fill-color: initial;
+  color: #FDE68A;                                /* amber-200 */
+  text-shadow: 0 2px 16px rgba(251, 191, 36, 0.25);
+}
+
+/* Hero tagline — the body palette is too dim against the deep indigo
+   background; use a solid lighter colour in dark mode. */
+.kid-hero-tagline { color: #334155; }            /* slate-700 */
+.dark .kid-hero-tagline { color: #F1F5F9; }      /* slate-100 */
+
+/*
+  The four feature tiles. Each variant uses a soft pastel in light mode and
+  a tinted dark surface in dark mode. Keeping the per-tile accent colour
+  (--ring) stable across modes preserves the brand identity of each tile.
+*/
+.kid-tile-yellow { background: #FEF3C7; --ring: #F59E0B; }
+.dark .kid-tile-yellow { background: #422006; }
+.kid-tile-blue   { background: #DBEAFE; --ring: #2563EB; }
+.dark .kid-tile-blue   { background: #172554; }
+.kid-tile-pink   { background: #FCE7F3; --ring: #DB2777; }
+.dark .kid-tile-pink   { background: #500724; }
+.kid-tile-mint   { background: #D1FAE5; --ring: #059669; }
+.dark .kid-tile-mint   { background: #052E2B; }
+
+/* Tile inner badge — white in light, slate-900 in dark to keep the icon
+   floating on a contrasting surface. The coloured drop-shadow (--ring)
+   stays the same in both modes so the brand colour reads through. */
+.kid-tile-badge {
+  background: white;
+  box-shadow: 0 6px 0 0 var(--ring);
+}
+.dark .kid-tile-badge {
+  background: #0F172A;
+}
+
+/* ============================================================
+   Modern animation utilities (landing page v2)
+   ============================================================
+   Reusable classes for scroll-triggered reveals, hover lifts,
+   floating decoration, animated gradients, and image zoom.
+   All animations respect prefers-reduced-motion via the block
+   at the bottom of this file. */
+
+/* ---------- Scroll-triggered reveal ---------- */
+/* Pair with the useScrollReveal hook from utils/scrollReveal.js. The
+   element starts invisible + offset; when the hook adds `is-visible`,
+   it eases into place. One-shot (the hook disconnects after first
+   intersection) so there's no flicker on scroll back. */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger delays — slap one of these on a child to delay its reveal. */
+.reveal-d1 { transition-delay:  80ms; }
+.reveal-d2 { transition-delay: 160ms; }
+.reveal-d3 { transition-delay: 240ms; }
+.reveal-d4 { transition-delay: 320ms; }
+.reveal-d5 { transition-delay: 400ms; }
+.reveal-d6 { transition-delay: 480ms; }
+
+/* ---------- Floating decorative shapes ---------- */
+/* Two slightly different keyframes so multiple blobs in the same view
+   don't move in lockstep. Slow durations (18–24s) keep motion gentle. */
+@keyframes blob-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(40px, -60px) scale(1.08); }
+  66%      { transform: translate(-30px, 30px) scale(0.95); }
+}
+@keyframes blob-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(-50px, 40px) scale(0.92); }
+  66%      { transform: translate(20px, -30px) scale(1.12); }
+}
+.blob-anim {
+  animation: blob-float-1 18s ease-in-out infinite;
+  will-change: transform;
+}
+.blob-anim-2 {
+  animation: blob-float-2 22s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Subtle vertical bob — for hero illustrations / icon badges. */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.float-y { animation: float-y 4s ease-in-out infinite; will-change: transform; }
+.float-y-slow { animation: float-y 6s ease-in-out infinite; will-change: transform; }
+
+/* ---------- Animated gradient background ---------- */
+/* Slow horizontal pan of a 200%-wide gradient. Set the actual gradient
+   inline (or via another class); this just animates the position. */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+.animated-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 14s ease infinite;
+}
+
+/* ---------- Glow pulse (CTA accent ring) ---------- */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.45); }
+  50%      { box-shadow: 0 0 0 14px rgba(99, 102, 241, 0); }
+}
+.glow-pulse { animation: glow-pulse 2.6s ease-in-out infinite; }
+
+/* ---------- Card hover lift ---------- */
+/* Use on cards / tiles. Lifts on hover with a soft brand-coloured
+   shadow underneath. The will-change prevents repaint jank when the
+   transform engages. */
+.card-lift {
+  transition:
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 44px -18px rgba(99, 102, 241, 0.30);
+}
+
+/* ---------- Image zoom on hover ---------- */
+/* Wrap an <img> (or any element that should scale) in image-zoom-wrap.
+   The wrapper clips overflow so the zoom doesn't bleed outside its
+   rounded corners. Works on both <img> and arbitrary elements via
+   the .image-zoom-target class. */
+.image-zoom-wrap { overflow: hidden; }
+.image-zoom-wrap img,
+.image-zoom-wrap > .image-zoom-target {
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.image-zoom-wrap:hover img,
+.image-zoom-wrap:hover > .image-zoom-target {
+  transform: scale(1.06);
+}
+
+/* ---------- Button shine sweep ---------- */
+/* A diagonal highlight that sweeps across the button on hover.
+   The pseudo-element is positioned absolutely; the parent should be
+   relative + overflow:hidden (handled by .btn-shine class). */
+@keyframes shine-sweep {
+  0%   { transform: translateX(-150%) skewX(-15deg); }
+  100% { transform: translateX(250%)  skewX(-15deg); }
+}
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 100%
+  );
+  transform: translateX(-150%) skewX(-15deg);
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  animation: shine-sweep 1.2s ease-out;
+}
+
+/* ---------- Marquee for testimonial-row hint of motion ---------- */
+/* Reserved — currently unused; left here because it's small and the
+   landing testimonials section can opt in later if desired. */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ---------- Reduced-motion override ---------- */
+/* Anyone who has the OS-level "Reduce motion" preference set sees the
+   page in its final state with no animation. We keep static styles
+   visible (opacity:1) so nothing's hidden. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-up,
+  .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .blob-anim,
+  .blob-anim-2,
+  .animated-gradient,
+  .float-y,
+  .float-y-slow,
+  .glow-pulse,
+  .kid-bob,
+  .kid-wiggle,
+  .kid-spin-slow,
+  .kid-float {
+    animation: none !important;
+  }
+  .card-lift {
+    transition: none !important;
+  }
+  .image-zoom-wrap:hover img,
+  .image-zoom-wrap:hover > .image-zoom-target {
+    transform: none !important;
+  }
+  .btn-shine:hover::after { animation: none !important; }
+}
