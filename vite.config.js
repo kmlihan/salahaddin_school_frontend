@@ -6,8 +6,8 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': 'https://salahaddin-school-backend.onrender.com',
-      '/uploads': 'https://salahaddin-school-backend.onrender.com',
+      '/api': 'https://salahaddin-school-backend.vercel.app/',
+      '/uploads': 'https://salahaddin-school-backend.vercel.app/',
     },
   },
 });
